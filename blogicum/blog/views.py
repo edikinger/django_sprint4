@@ -68,22 +68,22 @@ class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
     def get_object(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         if (
-            not post.is_published 
+            not post.is_published
             or not post.category.is_published
             or (post.pub_date > now())
         ):
             if post.author != self.request.user:
                 raise Http404
         return post
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-        context['comments'] = self.object.comments.select_related('author')\
-        .order_by('created_at')\
+        context['comments'] = self.object.comments.select_related('author') \
+        .order_by('created_at') \
         .all()
         return context
-    
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.test_func():
@@ -100,7 +100,11 @@ def registration(request):
             return redirect('login')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/registration_form.html', {'form': form})
+    return render(
+        request,
+        'registration/registration_form.html',
+        {'form': form}
+    )
 
 
 @login_required
@@ -108,7 +112,7 @@ def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return redirect('blog:post_detail', post_id=post_id)
-    
+
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
@@ -116,7 +120,7 @@ def edit_post(request, post_id):
                 return redirect('blog:login')
             post = form.save()
             return redirect('blog:post_detail', post_id=post.id)
-        
+
     else:
         form = PostForm(instance=post)
     
@@ -136,14 +140,12 @@ def add_comment(request, post_id):
             return redirect('blog:post_detail', post_id=post_id)
     else:
         form = CommentForm()
-        
     context = {
         'form': form,
         'post': post,
         'comment': comment
 
     }
-    
     return render(request, 'blog/comment.html', context)
 
 
@@ -151,11 +153,8 @@ def add_comment(request, post_id):
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     post = get_object_or_404(Post, id=post_id)
-    
-    # Проверяем права доступа
     if request.user != comment.author:
         return redirect('blog:post_detail', post_id=post_id)
-    
     if request.method == 'POST':
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
@@ -183,8 +182,6 @@ def delete_comment(request, post_id, comment_id):
             return redirect('blog:post_detail', post_id=post_id)
         else: 
             Http404
-    
-    
     return render(
         request, 
         'blog/comment.html', 
@@ -200,7 +197,6 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return redirect('blog:post_detail', post_id=post_id)
-    
     if request.method == 'POST':
         post.delete()
         return redirect('blog:profile', username=request.user.username)
@@ -288,5 +284,4 @@ def edit_profile(request):
             return redirect('blog:profile', username=request.user)
     else:
         form = ProfileEditForm(instance=request.user)
-        
     return render(request, 'blog/user.html', {'form': form})

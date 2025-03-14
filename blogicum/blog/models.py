@@ -24,7 +24,7 @@ class Location(models.Model):
     name = models.CharField(max_length=255)
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return self.name
 
@@ -81,16 +81,16 @@ class Post(CreatedAtIsPublished):
 
     def __str__(self):
         return self.title[:ABBREVIATED_TITLE]
-    
+
     @property
     def comments_count(self):
         return self.comments.count()
-    
+
     def get_image_url(self):
         if self.image:
             return self.image.url
         return None
-    
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
