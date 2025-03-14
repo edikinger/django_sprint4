@@ -18,7 +18,8 @@ urlpatterns = [
         'auth/',
         include('django.contrib.auth.urls')
     ),
-    path('profile/<str:username>/',
+    path(
+        'profile/<str:username>/',
         views.ProfileDetailView.as_view(),
         name='profile'
     ),
@@ -34,8 +35,8 @@ urlpatterns = [
     ),
     path(
         'posts/<int:post_id>/comment/',
-          views.add_comment,
-          name='add_comment'
+        views.add_comment,
+        name='add_comment'
     ),
     path(
         'posts/<int:post_id>/edit_comment/<int:comment_id>/',

@@ -80,8 +80,8 @@ class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         context['comments'] = self.object.comments.select_related(
-        'author').order_by('created_at'
-        ).all()
+            'author'
+        ).order_by('created_at')
         return context
 
     def get(self, request, *args, **kwargs):
@@ -183,7 +183,7 @@ def delete_comment(request, post_id, comment_id):
     return render(
         request,
         'blog/comment.html',
-        {'comment': comment,}
+        {'comment': comment}
     )
 
 
@@ -243,10 +243,10 @@ def index(request):
 
 def category_posts(request, category_slug: str):
     category = get_object_or_404(
-            Category.objects.select_related(),
-            slug=category_slug,
-            is_published=True,
-        )
+        Category.objects.select_related(),
+        slug=category_slug,
+        is_published=True,
+    )
     post_list = category.posts.filter(
         is_published=True,
         pub_date__lte=timezone.now()

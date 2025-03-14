@@ -18,8 +18,7 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('auth/', include('django.contrib.auth.urls')),
-     path('__debug__/', include('debug_toolbar.urls')),
-    
+    path('__debug__/', include('debug_toolbar.urls')),
 ]
 
 if settings.DEBUG:
