@@ -79,9 +79,9 @@ class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-        context['comments'] = self.object.comments.select_related('author') \
-        .order_by('created_at') \
-        .all()
+        context['comments'] = self.object.comments.select_related(
+        'author').order_by('created_at'
+        ).all()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -120,10 +120,8 @@ def edit_post(request, post_id):
                 return redirect('blog:login')
             post = form.save()
             return redirect('blog:post_detail', post_id=post.id)
-
     else:
         form = PostForm(instance=post)
-    
     return render(request, 'blog/create.html', {'form': form, 'post': post})
 
 
@@ -180,15 +178,12 @@ def delete_comment(request, post_id, comment_id):
         if request.user == comment.author or request.user.is_superuser:
             comment.delete()
             return redirect('blog:post_detail', post_id=post_id)
-        else: 
+        else:
             Http404
     return render(
-        request, 
-        'blog/comment.html', 
-        {
-            'comment': comment,
-            
-        }
+        request,
+        'blog/comment.html',
+        {'comment': comment,}
     )
 
 

@@ -8,6 +8,7 @@ from .constants import MAX_LENGTH_CHAR_FIELD, ABBREVIATED_TITLE
 
 User = get_user_model()
 
+
 class CreatedAtIsPublished(models.Model):
     is_published = models.BooleanField(
         "Опубликовано",
@@ -51,8 +52,9 @@ class Post(CreatedAtIsPublished):
     title = models.CharField("Заголовок", max_length=MAX_LENGTH_CHAR_FIELD)
     text = models.TextField("Текст")
     pub_date = models.DateTimeField(
-    default=timezone.now,
-    help_text="Выберите дату публикации")
+        default=timezone.now,
+        help_text="Выберите дату публикации"
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -71,7 +73,11 @@ class Post(CreatedAtIsPublished):
         null=True,
         verbose_name="Категория",
     )
-    image = models.ImageField('Изображение', upload_to='images/', blank=True, null=True)
+    image = models.ImageField(
+        'Изображение',
+        upload_to='images/',
+        blank=True, null=True
+    )
 
     class Meta:
         verbose_name = "публикация"
@@ -93,7 +99,10 @@ class Post(CreatedAtIsPublished):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE,
+        related_name='comments'
+    )
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
