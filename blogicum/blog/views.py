@@ -16,14 +16,15 @@ from .models import Comment, User, Post
 from .forms import CommentForm, PostForm, ProfileEditForm
 from .constants import PAGINATION_COUNT_POST_PER_PAGE
 
+
 class ChangePasswordView(PasswordChangeView):
     success_url = reverse_lazy('profile')
 
 
 class ProfileDetailView(DetailView):
     model = User
-    template_name ='blog/profile.html'
-    
+    template_name = 'blog/profile.html'
+
     def get_object(self):
         return get_object_or_404(User, username=self.kwargs['username'])
 
@@ -33,14 +34,11 @@ class ProfileDetailView(DetailView):
             .select_related('category', 'location', 'author')\
             .prefetch_related('comments')\
             .order_by('-pub_date')
-        
         for post in posts:
             post.comment_count = post.comments.count()
-        
         page = self.paginated_view(self.request, posts)
         context['page_obj'] = page
         context['profile'] = self.object
-        
         return context
 
     def paginated_view(self, request, queryset):
@@ -54,6 +52,7 @@ class ProfileDetailView(DetailView):
             page = paginator.page(paginator.num_pages)
         return page
 
+
 class OnlyAuthorMixin(UserPassesTestMixin):
     def test_func(self):
         post = self.get_object()
@@ -65,7 +64,7 @@ class OnlyAuthorMixin(UserPassesTestMixin):
 class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
     model = Post
     template_name = 'blog/detail.html'
-    
+
     def get_object(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         if (
@@ -80,7 +79,9 @@ class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-        context['comments'] = self.object.comments.select_related('author').order_by('created_at').all()
+        context['comments'] = self.object.comments.select_related('author')\
+        .order_by('created_at')\
+        .all()
         return context
     
     def get(self, request, *args, **kwargs):
