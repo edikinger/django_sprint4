@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.contrib.auth.models import User
 
 from .constants import MAX_LENGTH_CHAR_FIELD, ABBREVIATED_TITLE
+
 
 User = get_user_model()
 
@@ -18,18 +20,13 @@ class CreatedAtIsPublished(models.Model):
         abstract = True
 
 
-class Location(CreatedAtIsPublished):
-    name = models.CharField(
-        verbose_name="Название места",
-        max_length=MAX_LENGTH_CHAR_FIELD
-    )
-
-    class Meta:
-        verbose_name = "местоположение"
-        verbose_name_plural = "Местоположения"
-
+class Location(models.Model):
+    name = models.CharField(max_length=255)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self):
-        return self.name[:ABBREVIATED_TITLE]
+        return self.name
 
 
 class Category(CreatedAtIsPublished):
@@ -54,10 +51,8 @@ class Post(CreatedAtIsPublished):
     title = models.CharField("Заголовок", max_length=MAX_LENGTH_CHAR_FIELD)
     text = models.TextField("Текст")
     pub_date = models.DateTimeField(
-        "Дата и время публикации",
-        help_text=("Если установить дату и время в будущем"
-                   " — можно делать отложенные публикации.")
-    )
+    default=timezone.now,
+    help_text="Выберите дату публикации")
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -74,41 +69,34 @@ class Post(CreatedAtIsPublished):
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Категория"
+        verbose_name="Категория",
     )
-    image = models.ImageField('Изображение', upload_to='images/', null=True, blank=True)
-
-    @property
-    def has_image(self):
-        return self.image and self.image.name
-
-    @property
-    def comment_count(self):
-        return self.comments.count()
-    
+    image = models.ImageField('Изображение', upload_to='images/', blank=True, null=True)
 
     class Meta:
         verbose_name = "публикация"
         verbose_name_plural = "Публикации"
         default_related_name = "posts"
         ordering = ("-pub_date",)
-    
+
     def __str__(self):
         return self.title[:ABBREVIATED_TITLE]
-
+    
+    @property
+    def comments_count(self):
+        return self.comments.count()
+    
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return None
+    
 
 class Comment(models.Model):
-    text = models.TextField("Текст")
-    post_id = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        related_name = "comments"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        ordering = ("created_at",)
-    
     def __str__(self):
-        return f"Комментарий от {self.author} к посту {self.post_id}"
+        return self.text[:50]

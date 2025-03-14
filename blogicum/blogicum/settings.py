@@ -8,8 +8,7 @@ SECRET_KEY = 'django-insecure-sgq@wi1#-4$swl-w#*4zvpb&75%5nal)y_lx^@j=u&j+%38#sk
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost',
-    '127.0.0.1',]
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'pages.apps.PagesConfig',
@@ -20,8 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'django_bootstrap5',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -100,14 +99,8 @@ INTERNAL_IPS = [
 ]
 
 MEDIA_ROOT = BASE_DIR / 'media'
-
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-
+THUMBNAIL_SIZE = (400, 400)
+BASE_DIR = Path(__file__).resolve().parent.parent
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
-
-HANDLER403 = 'pages.views.handler403'
-HANDLER404 = 'pages.views.handler404'
-HANDLER500 = 'pages.views.handler500'
-
-CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 LOGIN_URL = 'login'
+CSRF_FAILURE_VIEW = 'pages.views.error_403'

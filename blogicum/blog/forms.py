@@ -1,8 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import User, Comment
+from .models import Comment, Post, User
 
-from .models import Post
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -22,31 +25,8 @@ class PostForm(forms.ModelForm):
             'image': 'Изображение',
         }
 
-class CommentForm(forms.ModelForm):
-    
-    class Meta:
-        model = Comment
-        fields = ('text',)
-
-
-class RegistrationForm(UserCreationForm):
-    first_name = forms.CharField(
-        label='Имя',
-        max_length=30,
-        required=False,
-        help_text='Введите ваше имя (необязательно)'
-    )
-    email = forms.EmailField(
-        required=False,
-        help_text='Введите email (необязательно)'
-    )
-
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'email', 'password1', 'password2', )
-
 
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'email')
+        fields = ('username', 'first_name', 'last_name', 'email')
