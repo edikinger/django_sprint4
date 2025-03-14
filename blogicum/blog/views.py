@@ -19,9 +19,10 @@ from .constants import PAGINATION_COUNT_POST_PER_PAGE
 class ChangePasswordView(PasswordChangeView):
     success_url = reverse_lazy('profile')
 
+
 class ProfileDetailView(DetailView):
     model = User
-    template_name = 'blog/profile.html'
+    template_name ='blog/profile.html'
     
     def get_object(self):
         return get_object_or_404(User, username=self.kwargs['username'])
@@ -88,6 +89,8 @@ class PostDetailView(LoginRequiredMixin, OnlyAuthorMixin, DetailView):
             return Http404
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
+
+
 def registration(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -97,6 +100,7 @@ def registration(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/registration_form.html', {'form': form})
+
 
 @login_required
 def edit_post(request, post_id):
@@ -116,6 +120,7 @@ def edit_post(request, post_id):
         form = PostForm(instance=post)
     
     return render(request, 'blog/create.html', {'form': form, 'post': post})
+
 
 @login_required
 def add_comment(request, post_id):
@@ -139,6 +144,7 @@ def add_comment(request, post_id):
     }
     
     return render(request, 'blog/comment.html', context)
+
 
 @login_required
 def edit_comment(request, post_id, comment_id):
@@ -166,6 +172,7 @@ def edit_comment(request, post_id, comment_id):
         }
     )
 
+
 @login_required
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
@@ -186,6 +193,7 @@ def delete_comment(request, post_id, comment_id):
         }
     )
 
+
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -196,6 +204,7 @@ def delete_post(request, post_id):
         post.delete()
         return redirect('blog:profile', username=request.user.username)
     return render(request, 'blog/comments.html', {'post': post})
+
 
 @login_required
 def create_post(request):
@@ -211,6 +220,7 @@ def create_post(request):
     else:
         form = PostForm()
     return render(request, 'blog/create.html', {'form': form})
+
 
 def index(request):
     post_list = Post.objects.filter(
@@ -237,6 +247,7 @@ def index(request):
         'blog/index.html',
         context
     )
+
 
 def category_posts(request, category_slug: str):
     category = get_object_or_404(
@@ -265,6 +276,7 @@ def category_posts(request, category_slug: str):
         'blog/category.html',
         context
     )
+
 
 @login_required
 def edit_profile(request):
