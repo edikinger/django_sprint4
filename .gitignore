@@ -148,4 +148,4 @@ dmypy.json
 sent_emails/
 
 # Игнорировать папку со статикой.
-static_dev/
+static/
