@@ -12,10 +12,10 @@ User = get_user_model()
 class CreatedAt(models.Model):
     created_at = models.DateTimeField("Добавлено", auto_now_add=True)
 
-
     class Meta:
         abstract = True
         ordering = ("-created_at",)
+
 
 class CreatedAtIsPublished(CreatedAt):
     is_published = models.BooleanField(
@@ -109,7 +109,7 @@ class Comment(CreatedAt):
         verbose_name="Комментарии к посту"
     )
     author = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE,
         verbose_name="Автор публикации"
     )
@@ -124,40 +124,3 @@ class Comment(CreatedAt):
 
     def __str__(self):
         return self.text[:50]
-
-
-# class Post(CreatedAtIsPublished):
-#     title = models.CharField("Заголовок", max_length=MAX_LENGTH_CHAR_FIELD)
-#     text = models.TextField("Текст")
-#     pub_date = models.DateTimeField(
-#         "Дата и время публикации",
-#         help_text=("Если установить дату и время в будущем"
-#                    " — можно делать отложенные публикации.")
-#     )
-#     author = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         verbose_name="Автор публикации"
-#     )
-#     location = models.ForeignKey(
-#         Location,
-#         on_delete=models.SET_NULL,
-#         null=True,
-#         blank=True,
-#         verbose_name="Местоположение"
-#     )
-#     category = models.ForeignKey(
-#         Category,
-#         on_delete=models.SET_NULL,
-#         null=True,
-#         verbose_name="Категория"
-#     )
-
-#     class Meta:
-#         verbose_name = "публикация"
-#         verbose_name_plural = "Публикации"
-#         default_related_name = "posts"
-#         ordering = ("-pub_date",)
-
-#     def __str__(self):
-#         return self.title[:ABBREVIATED_TITLE]

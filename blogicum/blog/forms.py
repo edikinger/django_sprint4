@@ -13,7 +13,7 @@ class CommentForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        exclude = ('author','is_published', 'created_date',)
+        exclude = ('author', 'is_published', 'created_date',)
         widgets = {
             'pub_date': forms.DateTimeInput(
                 format='%Y-%m-%dT%H:%M',
@@ -29,11 +29,13 @@ class PostForm(forms.ModelForm):
             'location': 'Местоположение',
             'image': 'Изображение',
         }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         now = timezone.now().astimezone()
         formatted_date = now.isoformat()[:16]
         self.initial['pub_date'] = formatted_date
+
 
 class ProfileEditForm(forms.ModelForm):
     class Meta:

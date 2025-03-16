@@ -18,15 +18,20 @@ def posts_filter_by_publish(posts):
         pub_date__lte=now(),
     ).select_related('category', 'location', 'author')
 
+
 def annotate_posts(queryset):
-    """Добавляет к QuerySet аннотацию c количеством комментариев"""
+    """Добавляет к QuerySet аннотацию c количеством комментариев."""
     return queryset.annotate(comment_count=Count('comments'))
 
-def paginate_queryset(queryset, request, per_page=PAGINATION_COUNT_POST_PER_PAGE):
-    """ Функция для пагинации QuerySet."""
+
+def paginate_queryset(
+        queryset,
+        request,
+        per_page=PAGINATION_COUNT_POST_PER_PAGE
+    ):
+    """Функция для пагинации QuerySet."""
     paginator = Paginator(queryset, per_page)
     page = request.GET.get('page')
-    
     try:
         page_obj = paginator.page(page)
     except PageNotAnInteger:
