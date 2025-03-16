@@ -1,10 +1,16 @@
 from django.urls import path, include
+
 from . import views
+
+
 app_name = 'blog'
 
-
 urlpatterns = [
-    path('', views.index, name='index'),
+    path(
+        '',
+        views.index,
+        name='index'
+    ),
     path(
         'posts/<int:post_id>/',
         views.PostDetailView.as_view(),
@@ -15,10 +21,6 @@ urlpatterns = [
         views.category_posts, name='category_posts'
     ),
     path(
-        'auth/',
-        include('django.contrib.auth.urls')
-    ),
-    path(
         'profile/<str:username>/',
         views.ProfileDetailView.as_view(),
         name='profile'
@@ -27,11 +29,6 @@ urlpatterns = [
         'edit_profile/',
         views.edit_profile,
         name='edit_profile'
-    ),
-    path(
-        'password_change/',
-        views.ChangePasswordView.as_view(),
-        name='password_change'
     ),
     path(
         'posts/<int:post_id>/comment/',
