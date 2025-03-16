@@ -77,7 +77,7 @@ class PostDetailView(DetailView):
             filtered_posts = posts_filter_by_publish(Post.objects.all())
             return get_object_or_404(
                 filtered_posts,
-                  pk=self.kwargs.get('post_id')
+                pk=self.kwargs.get('post_id')
             )
 
     def get_context_data(self, **kwargs):
@@ -179,7 +179,9 @@ def create_post(request):
 
 
 def index(request):
-    post_list = posts_filter_by_publish(Post.objects.all()).order_by('-pub_date')
+    post_list = posts_filter_by_publish(
+        Post.objects.all()
+    ).order_by('-pub_date')
     post_list = annotate_posts(post_list)
     context = paginate_queryset(post_list, request)
     return render(
