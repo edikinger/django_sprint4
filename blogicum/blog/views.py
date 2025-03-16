@@ -28,7 +28,7 @@ def paginate_queryset(
         queryset,
         request,
         per_page=PAGINATION_COUNT_POST_PER_PAGE
-    ):
+):
     """Функция для пагинации QuerySet."""
     paginator = Paginator(queryset, per_page)
     page = request.GET.get('page')
@@ -38,7 +38,6 @@ def paginate_queryset(
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    
     return {
         'page_obj': page_obj
     }
@@ -48,7 +47,6 @@ class ProfileDetailView(ListView):
     model = User
     template_name = 'blog/profile.html'
     paginate_by = PAGINATION_COUNT_POST_PER_PAGE
-
 
     def get_queryset(self):
         author = get_object_or_404(User, username=self.kwargs['username'])
@@ -77,12 +75,19 @@ class PostDetailView(DetailView):
             return post
         else:
             filtered_posts = posts_filter_by_publish(Post.objects.all())
-            return get_object_or_404(filtered_posts, pk=self.kwargs.get('post_id'))
+            return get_object_or_404(
+                filtered_posts,
+                  pk=self.kwargs.get('post_id')
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
-        context['comments'] = self.object.comments.select_related('author').order_by('created_at')
+        context['comments'] = self.object.comments.select_related(
+            'author'
+        ).order_by(
+            'created_at'
+        )
         return context
 
 
