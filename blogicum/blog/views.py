@@ -8,39 +8,9 @@ from django.views.generic import DetailView, ListView
 from .constants import PAGINATION_COUNT_POST_PER_PAGE
 from .forms import CommentForm, PostForm, ProfileEditForm
 from .models import Category, Comment, Post, User
+from .services import annotate_posts, posts_filter_by_publish, paginate_queryset
 
 
-def posts_filter_by_publish(posts):
-    """Функция возвращает набор актуальных и опубликованных постов."""
-    return posts.filter(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=now(),
-    ).select_related('category', 'location', 'author')
-
-
-def annotate_posts(queryset):
-    """Добавляет к QuerySet аннотацию c количеством комментариев."""
-    return queryset.annotate(comment_count=Count('comments'))
-
-
-def paginate_queryset(
-        queryset,
-        request,
-        per_page=PAGINATION_COUNT_POST_PER_PAGE
-):
-    """Функция для пагинации QuerySet."""
-    paginator = Paginator(queryset, per_page)
-    page = request.GET.get('page')
-    try:
-        page_obj = paginator.page(page)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-    return {
-        'page_obj': page_obj
-    }
 
 
 class ProfileDetailView(ListView):
@@ -49,12 +19,12 @@ class ProfileDetailView(ListView):
     paginate_by = PAGINATION_COUNT_POST_PER_PAGE
 
     def get_queryset(self):
-        author = get_object_or_404(User, username=self.kwargs['username'])
+        author = self.get_author()
         queryset = author.posts.all()
         queryset = annotate_posts(queryset)
         if self.request.user != author:
             queryset = posts_filter_by_publish(queryset)
-        return queryset.order_by('-pub_date')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,20 +43,16 @@ class PostDetailView(DetailView):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         if self.request.user == post.author:
             return post
-        else:
-            filtered_posts = posts_filter_by_publish(Post.objects.all())
-            return get_object_or_404(
-                filtered_posts,
-                pk=self.kwargs.get('post_id')
-            )
+        return get_object_or_404(
+            posts_filter_by_publish(Post.objects.all()),
+            pk=self.kwargs.get('post_id')
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         context['comments'] = self.object.comments.select_related(
             'author'
-        ).order_by(
-            'created_at'
         )
         return context
 
@@ -112,14 +78,7 @@ def add_comment(request, post_id):
         comment.post = post
         comment.author = request.user
         comment.save()
-        return redirect('blog:post_detail', post_id=post_id)
-    context = {
-        'form': form,
-        'post': post,
-        'comment': comment
-
-    }
-    return render(request, 'blog/comment.html', context)
+    return redirect('blog:post_detail', post_id=post_id)
 
 
 @login_required
@@ -135,9 +94,8 @@ def edit_comment(request, post_id, comment_id):
         request,
         'blog/comment.html',
         {
-            'comment': comment,
-            'form': form,
-            'post': comment.post,
+            'form': form, 
+            'comment': comment, # Не проходит тесты, если не передавать объект коммента :(
         }
     )
 
@@ -159,12 +117,13 @@ def delete_comment(request, post_id, comment_id):
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+    form = PostForm(request.POST or None, instance = post)
     if request.user != post.author:
         return redirect('blog:post_detail', post_id=post_id)
     if request.method == 'POST':
         post.delete()
         return redirect('blog:profile', username=request.user.username)
-    return render(request, 'blog/comments.html', {'post': post})
+    return render(request, 'blog/create.html', {'form': form})
 
 
 @login_required
@@ -181,9 +140,14 @@ def create_post(request):
 def index(request):
     post_list = posts_filter_by_publish(
         Post.objects.all()
-    ).order_by('-pub_date')
+    )
     post_list = annotate_posts(post_list)
-    context = paginate_queryset(post_list, request)
+    page_obj = paginate_queryset(post_list, request)
+    
+    context = {
+        'page_obj': page_obj
+    }
+    
     return render(
         request,
         'blog/index.html',
@@ -200,16 +164,16 @@ def category_posts(request, category_slug: str):
     all_posts = category.posts.all()
     filtered_posts = posts_filter_by_publish(all_posts)
     post_list = annotate_posts(filtered_posts)
-    post_list = post_list.order_by('-pub_date')
-    pagination_context = paginate_queryset(post_list, request)
-    context = {
-        'category': category,
-        **pagination_context
-    }
+    post_list = post_list
+    page_obj = paginate_queryset(post_list, request)
+    
     return render(
         request,
         'blog/category.html',
-        context
+        {
+            'category': category,
+            'page_obj': page_obj
+        }
     )
 
 

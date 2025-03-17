@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from .constants import MAX_LENGTH_CHAR_FIELD, ABBREVIATED_TITLE
+from .constants import MAX_LENGTH_CHAR_FIELD, ABBREVIATED_TITLE, SHORTENED_TEXT
 
 
 User = get_user_model()
@@ -14,7 +14,7 @@ class CreatedAt(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ("-created_at",)
+        ordering = ("created_at",)
 
 
 class CreatedAtIsPublished(CreatedAt):
@@ -88,7 +88,7 @@ class Post(CreatedAtIsPublished):
         verbose_name="Категория",
     )
     image = models.ImageField(
-        'Изображение',
+        "Изображение",
         upload_to='images/',
         blank=True, null=True
     )
@@ -123,4 +123,4 @@ class Comment(CreatedAt):
         default_related_name = 'comments'
 
     def __str__(self):
-        return self.text[:50]
+        return self.text[:SHORTENED_TEXT]
