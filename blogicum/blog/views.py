@@ -117,7 +117,7 @@ def delete_comment(request, post_id, comment_id):
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    form=PostForm(request.POST or None, instance = post)
+    form = PostForm(request.POST or None, instance=post)
     if request.user != post.author:
         return redirect('blog:post_detail', post_id=post_id)
     if request.method == 'POST':
