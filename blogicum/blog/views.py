@@ -1,16 +1,15 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.timezone import now
 from django.views.generic import DetailView, ListView
 
 from .constants import PAGINATION_COUNT_POST_PER_PAGE
 from .forms import CommentForm, PostForm, ProfileEditForm
 from .models import Category, Comment, Post, User
-from .services import annotate_posts, posts_filter_by_publish, paginate_queryset
-
-
+from .services import (
+    annotate_posts,
+    posts_filter_by_publish,
+    paginate_queryset
+)
 
 
 class ProfileDetailView(ListView):
@@ -95,7 +94,8 @@ def edit_comment(request, post_id, comment_id):
         'blog/comment.html',
         {
             'form': form, 
-            'comment': comment, # Не проходит тесты, если не передавать объект коммента :(
+            'comment': comment,
+            # Не проходит тесты, если не передавать объект коммента :(
         }
     )
 
@@ -143,11 +143,9 @@ def index(request):
     )
     post_list = annotate_posts(post_list)
     page_obj = paginate_queryset(post_list, request)
-    
     context = {
         'page_obj': page_obj
     }
-    
     return render(
         request,
         'blog/index.html',

@@ -1,7 +1,9 @@
-from .constants import PAGINATION_COUNT_POST_PER_PAGE
+from django.core.paginator import Paginator
 from django.db.models import Count
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.utils.timezone import now
+
+from .constants import PAGINATION_COUNT_POST_PER_PAGE
+
 
 def posts_filter_by_publish(posts):
     """Функция возвращает набор актуальных и опубликованных постов."""
