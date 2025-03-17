@@ -93,7 +93,7 @@ def edit_comment(request, post_id, comment_id):
         request,
         'blog/comment.html',
         {
-            'form': form, 
+            'form': form,
             'comment': comment,
             # Не проходит тесты, если не передавать объект коммента :(
         }
@@ -117,7 +117,7 @@ def delete_comment(request, post_id, comment_id):
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    form = PostForm(request.POST or None, instance = post)
+    form=PostForm(request.POST or None, instance = post)
     if request.user != post.author:
         return redirect('blog:post_detail', post_id=post_id)
     if request.method == 'POST':
@@ -164,7 +164,6 @@ def category_posts(request, category_slug: str):
     post_list = annotate_posts(filtered_posts)
     post_list = post_list
     page_obj = paginate_queryset(post_list, request)
-    
     return render(
         request,
         'blog/category.html',
