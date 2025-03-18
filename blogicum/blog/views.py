@@ -143,13 +143,12 @@ def index(request):
     )
     post_list = annotate_posts(post_list)
     page_obj = paginate_queryset(post_list, request)
-    context = {
-        'page_obj': page_obj
-    }
     return render(
         request,
         'blog/index.html',
-        context
+        {
+            'page_obj': page_obj
+        }
     )
 
 
@@ -162,7 +161,6 @@ def category_posts(request, category_slug: str):
     all_posts = category.posts.all()
     filtered_posts = posts_filter_by_publish(all_posts)
     post_list = annotate_posts(filtered_posts)
-    post_list = post_list
     page_obj = paginate_queryset(post_list, request)
     return render(
         request,

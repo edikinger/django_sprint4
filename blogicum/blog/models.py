@@ -89,7 +89,7 @@ class Post(CreatedAtIsPublished):
     )
     image = models.ImageField(
         "Изображение",
-        upload_to='images/',
+        upload_to="images/",
         blank=True, null=True
     )
 
